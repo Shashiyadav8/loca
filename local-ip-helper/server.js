@@ -20,7 +20,7 @@ function getLocalIP() {
 
 // Restrict access to only your frontend domain
 app.use(cors({
-  origin: ['https://frontend-q8ve.onrender.com'], // 🔐 Replace with your actual deployed site
+  origin: ['https://frontend-5aqd.onrender.com'], // 🔐 Replace with your actual deployed site
   methods: ['GET']
 }));
 
