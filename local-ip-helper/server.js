@@ -1,31 +1,30 @@
-// server.js
 const express = require('express');
-const os = require('os');
 const cors = require('cors');
-const app = express();
-const PORT = 3001;
+const os = require('os');
 
-// Get your local IPv4 address
-function getLocalIP() {
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// ✅ Only allow your frontend
+app.use(cors({
+  origin: ['https://frontend-5aqd.onrender.com'], // ⬅️ your deployed React app
+  methods: ['GET'],
+}));
+
+// ✅ Route to get local IP
+app.get('/api/ip', (req, res) => {
   const interfaces = os.networkInterfaces();
-  for (const iface of Object.values(interfaces)) {
-    for (const info of iface) {
-      if (info.family === 'IPv4' && !info.internal) {
-        return info.address;
+  let ip = '127.0.0.1';
+
+  for (const name of Object.keys(interfaces)) {
+    for (const net of interfaces[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        ip = net.address;
+        break;
       }
     }
   }
-  return '127.0.0.1';
-}
 
-// Restrict access to only your frontend domain
-app.use(cors({
-  origin: ['https://frontend-5aqd.onrender.com'], // 🔐 Replace with your actual deployed site
-  methods: ['GET']
-}));
-
-app.get('/api/ip', (req, res) => {
-  const ip = getLocalIP();
   res.json({ ip });
 });
 
