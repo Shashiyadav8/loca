@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const os = require('os');
@@ -6,26 +5,16 @@ const os = require('os');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ Allow only your deployed React frontend to access
-const allowedOrigins = ['https://frontend-5aqd.onrender.com']; // 🔁 Change to your actual frontend domain
+// ✅ Strict CORS: Allow only your deployed frontend
+app.use(cors({
+  origin: 'https://frontend-5aqd.onrender.com',  // 🔒 Your frontend domain here
+  methods: ['GET'],
+}));
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('❌ CORS: Not allowed'));
-      }
-    },
-    methods: ['GET'],
-  })
-);
-
-// ✅ Route to get local IP
+// ✅ API route to get local device IP
 app.get('/api/ip', (req, res) => {
   const interfaces = os.networkInterfaces();
-  let ip = '127.0.0.1';
+  let ip = '127.0.0.1'; // fallback
 
   for (const name of Object.keys(interfaces)) {
     for (const net of interfaces[name]) {
@@ -39,7 +28,7 @@ app.get('/api/ip', (req, res) => {
   res.json({ ip });
 });
 
-// ✅ Start server
+// ✅ Start the server
 app.listen(PORT, () => {
   console.log(`✅ Local IP Helper running at http://localhost:${PORT}/api/ip`);
 });
