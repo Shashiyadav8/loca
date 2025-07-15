@@ -1,3 +1,4 @@
+// server.js
 const express = require('express');
 const cors = require('cors');
 const os = require('os');
@@ -5,11 +6,21 @@ const os = require('os');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ Only allow your frontend
-app.use(cors({
-  origin: ['https://frontend-5aqd.onrender.com'], // ⬅️ your deployed React app
-  methods: ['GET'],
-}));
+// ✅ Allow only your deployed React frontend to access
+const allowedOrigins = ['https://frontend-5aqd.onrender.com']; // 🔁 Change to your actual frontend domain
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('❌ CORS: Not allowed'));
+      }
+    },
+    methods: ['GET'],
+  })
+);
 
 // ✅ Route to get local IP
 app.get('/api/ip', (req, res) => {
@@ -28,6 +39,7 @@ app.get('/api/ip', (req, res) => {
   res.json({ ip });
 });
 
+// ✅ Start server
 app.listen(PORT, () => {
   console.log(`✅ Local IP Helper running at http://localhost:${PORT}/api/ip`);
 });
